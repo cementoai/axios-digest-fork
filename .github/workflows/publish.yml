@@ -46,7 +46,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 20
-          cache: 'none'  # Disable automatic npm cache to avoid 400 errors
+          cache: 'npm'  # Disable automatic npm cache to avoid 400 errors
 
       # 5️⃣ Install dependencies
       - name: Install dependencies
