@@ -1,4 +1,4 @@
-name: 'Publish @cemento/axios-digest'
+name: 'Publish @cemento/axios-digest-fork'
 
 on:
   push:
