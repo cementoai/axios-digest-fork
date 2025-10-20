@@ -27,7 +27,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      # 2️⃣ Authenticate with GCP via Workload Identity
+      # 2️⃣ Authenticate with Google Cloud via Workload Identity
       - name: Authenticate with Google Cloud
         uses: google-github-actions/auth@v2
         with:
@@ -35,24 +35,24 @@ jobs:
           workload_identity_provider: projects/232804422965/locations/global/workloadIdentityPools/github-actions-bot/providers/oidc-provider
           service_account: github-actions@planme-1383.iam.gserviceaccount.com
 
-      # 3️⃣ Configure npm to use Artifact Registry
-      - name: Configure npm registry
-        run: |
-          echo "@cemento:registry=https://us-central1-npm.pkg.dev/${{ env.PROJECT_ID }}/cemento/" > .npmrc
-          echo "always-auth=true" >> .npmrc
-
-      # 4️⃣ Setup Node.js
+      # 3️⃣ Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 20
-          cache: 'npm'  # Disable automatic npm cache to avoid 400 errors
+
+      # 4️⃣ Generate npm token and configure registry
+      - name: Configure npm for GCP Artifact Registry
+        run: |
+          TOKEN=$(gcloud auth print-access-token)
+          echo "@cemento:registry=https://us-central1-npm.pkg.dev/${{ env.PROJECT_ID }}/cemento/" > .npmrc
+          echo "//us-central1-npm.pkg.dev/${{ env.PROJECT_ID }}/cemento/:_authToken=${TOKEN}" >> .npmrc
 
       # 5️⃣ Install dependencies
       - name: Install dependencies
         run: npm ci
 
-      # 6️⃣ Build package (optional if build script exists)
+      # 6️⃣ Build package (if build script exists)
       - name: Build package
         run: npm run build --if-present
 
