@@ -33,6 +33,9 @@ jobs:
         with:
           node-version: 20
 
+      - name: Create .npmrc
+        run: echo "@cemento:registry=https://us-central1-npm.pkg.dev/${{ env.PROJECT_ID }}/cemento/" >> .npmrc
+
       - name: Install dependencies
         run: npm install
 
