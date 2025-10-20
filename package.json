@@ -1,5 +1,5 @@
 {
-  "name": "axios-digest",
+  "name": "@cemento/axios-digest-fork",
   "version": "0.3.0",
   "description": "",
   "main": "dist/index.js",

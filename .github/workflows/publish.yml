@@ -1,20 +1,52 @@
-name: Node.js Package
+name: 'Publish axios-digest-fork'
+
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - master   # triggers on merge to master
+
+env:
+  PROJECT_ID: 'planme-1383'
+  PACKAGE_DIR: 'axios-digest-fork'
+
+permissions:
+  contents: 'read'
+  id-token: 'write'
+
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.PACKAGE_DIR }}
     steps:
-      - uses: actions/checkout@v2
-      # Setup .npmrc file to publish to npm
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
         with:
-          node-version: '16.x'
-          registry-url: 'https://registry.npmjs.org'
-      - run: npm ci
-      - run: npm run build
-      - run: npm publish ./
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+          fetch-depth: 0
+
+      - name: Authenticate with Google
+        uses: google-github-actions/auth@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+          workload_identity_provider: 'projects/232804422965/locations/global/workloadIdentityPools/github-actions-bot/providers/oidc-provider'
+          service_account: 'github-actions@planme-1383.iam.gserviceaccount.com'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Create .npmrc
+        run: echo "@cemento:registry=https://us-central1-npm.pkg.dev/${{ env.PROJECT_ID }}/cemento/" >> .npmrc
+
+      - name: Login to GCP NPM registry
+        run: npm run artifactregistry-login
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build package
+        run: npm run build
+
+      - name: Publish package to GCP
+        run: npm publish --registry=https://us-central1-npm.pkg.dev/${{ env.PROJECT_ID }}/cemento/
