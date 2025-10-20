@@ -78,9 +78,10 @@ export default class AxiosDigest {
 
   // eslint-disable-next-line class-methods-use-this
   private getWwwAuth(r: any) {
-    const { status } = r.response;
-    if (status === 401) {
-      return r.response.headers['www-authenticate'];
+    const res = r.response;
+    if (!res) throw Error("Target is not reachable");
+    if (res.status === 401) {
+      return r.response.headers["www-authenticate"];
     }
     throw r;
   }
