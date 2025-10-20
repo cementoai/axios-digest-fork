@@ -7,7 +7,6 @@
   "scripts": {
     "build": "tsc",
     "prepare": "npm run build",
-    "artifactregistry-login": "npx google-artifactregistry-auth",
     "test": "jest",
     "lint": "eslint 'index.ts'"
   },
